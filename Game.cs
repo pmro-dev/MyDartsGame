@@ -18,6 +18,13 @@ namespace MyDartsGame
         private int rndRingBonus;
         private int actualThrowScore;
         private readonly int startingScore;
+        private bool isDoubleBonusOrDoublePointsInSerie = false;
+
+        public bool DoubleBonusOrDoublePointsInSerie
+        {
+            get { return isDoubleBonusOrDoublePointsInSerie; }
+            set { isDoubleBonusOrDoublePointsInSerie = value; }
+        }
 
         readonly Random random = new Random();
 
@@ -29,32 +36,36 @@ namespace MyDartsGame
         {
             this.Players = players;
             this.startingScore = startingScore;
-
-            foreach(var player in Players)
+            DoubleBonusOrDoublePointsInSerie = this.isDoubleBonusOrDoublePointsInSerie;
+            foreach (var player in Players)
             {
                 player.RoundScore = startingScore;
                 Console.WriteLine($"Welcome {player.Name}");
             }
-
         }
 
-        public bool IsWinner(Player player)
-        {
-            if (player.RoundScore < 0)
-            {
-                Console.WriteLine($"The Winner is {player.Name}");
-                return true;
-            }
-            return false;
-        }
+        int throwPointsTemp;
 
         public bool IsActualThrowGivingWin(Player player)
         {
-            if(player.RoundScore - actualThrowScore == 0)
+            throwPointsTemp = player.ActualSerie[0];
+
+            if (isDoubleBonusOrDoublePointsInSerie is false)
             {
+                if (player.ActualSerie.Count(pointsInPastThrowsInActualSerie => pointsInPastThrowsInActualSerie == throwPointsTemp) >= 2)
+                {
+                    isDoubleBonusOrDoublePointsInSerie = true;
+                    Console.WriteLine("DOUBLE POINTS!");
+            }
+                else
+                {
+                    isDoubleBonusOrDoublePointsInSerie = false;
+        }
+            }
+
+            if(player.RoundScore - player.ActualSerie.Sum() == 0 && isDoubleBonusOrDoublePointsInSerie is true)
+        {
                 Console.WriteLine($"WINNER! {player.Name}");
-                player.ActualSerie.Add(actualThrowScore);
-                player.RoundScore -= actualThrowScore;
                 return true;
             }
 
@@ -64,8 +75,8 @@ namespace MyDartsGame
         // one dart throw in a serie
         public void ThrowRandomPointsWithRandomRingFor(Player player)
         {
+            Console.Write($"\n{player.Name} Throw\n");
             rndRingBonus = 1;
-
             rndIndex = random.Next(0, DartsPoints.Length);
             rndPoints = DartsPoints[rndIndex];
 
