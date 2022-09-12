@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace MyDartsGame
 {
@@ -30,7 +31,7 @@ namespace MyDartsGame
 
         private readonly int[] DartsPoints = new int[] { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 25, 50 };
         private readonly int[] BonusRing = new int[] { 1, 2, 3, 2, 3, 2, 3, 1 };
-        private readonly int[] WinScores = new int[3];
+        //private readonly int[] WinScores = new int[3];
 
         public Game(int startingScore, List<Player> players)
         {
@@ -92,7 +93,25 @@ namespace MyDartsGame
                 {
                     rndIndex = random.Next(0, BonusRing.Length);
                     rndRingBonus = BonusRing[rndIndex];
-                    actualThrowScore = (rndRingBonus == 1 ? rndPoints : rndRingBonus * rndPoints);
+
+                    switch (rndRingBonus)
+                    {
+                        case 1:
+                            actualThrowScore = rndPoints;
+                            break;
+
+                        case 2:
+                            actualThrowScore = rndRingBonus * rndPoints;
+                            isDoubleBonusOrDoublePointsInSerie = true;
+                            Console.WriteLine($"{player.Name} DOUBLE BONUS!");
+                            break;
+
+                        case 3:
+                            actualThrowScore = rndRingBonus * rndPoints;
+                            Console.WriteLine($"{player.Name} TRIPLE BONUS!");
+                            break;
+                    }
+
                     player.SerieScore += actualThrowScore;
                 }
                 else
@@ -105,7 +124,9 @@ namespace MyDartsGame
             {
                 actualThrowScore = 0;
             }
+
             player.ActualSerie.Add(actualThrowScore);
+            Console.WriteLine($"Actual Throw Points: {actualThrowScore}");
         }
 
         public void FinishSerieFor(Player player)
@@ -126,21 +147,22 @@ namespace MyDartsGame
                 player.ActualSerie = new();
                 player.SerieScore = 0;
                 player.RoundScore = startingScore;
+                isDoubleBonusOrDoublePointsInSerie = false;
             }
             Console.WriteLine("\nNew Round\n");
 
         }
 
-        public void FinishRound(int RoundIndex, int winnerId)
-        {
-            if (Players[0].ActualSerie.Count != Players[1].ActualSerie.Count)
-            {
-                    Players[1].ActualSerie.Add(0);
-                    Players[1].ActualSerie.Add(0);
-                    Players[1].ActualSerie.Add(0);
-            }
+        //public void FinishRound(int RoundIndex, int winnerId)
+        //{
+        //    if (Players[0].ActualSerie.Count != Players[1].ActualSerie.Count)
+        //    {
+        //            Players[1].ActualSerie.Add(0);
+        //            Players[1].ActualSerie.Add(0);
+        //            Players[1].ActualSerie.Add(0);
+        //    }
 
-            WinScores[RoundIndex] = winnerId;
-        }
+        //    WinScores[RoundIndex] = winnerId;
+        //}
     }
 }
