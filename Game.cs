@@ -57,15 +57,15 @@ namespace MyDartsGame
                 {
                     isDoubleBonusOrDoublePointsInSerie = true;
                     Console.WriteLine("DOUBLE POINTS!");
-            }
+                }
                 else
                 {
                     isDoubleBonusOrDoublePointsInSerie = false;
-        }
+                }
             }
 
             if(player.RoundScore - player.ActualSerie.Sum() == 0 && isDoubleBonusOrDoublePointsInSerie is true)
-        {
+            {
                 Console.WriteLine($"WINNER! {player.Name}");
                 return true;
             }
@@ -136,6 +136,13 @@ namespace MyDartsGame
             {
                 player.RoundScore -= player.ActualSerie.Sum();
             }
+
+            if (player.RoundScore - player.ActualSerie.Sum() == 0 && isDoubleBonusOrDoublePointsInSerie is true)
+            {
+                player.RoundScore -= actualThrowScore;
+            }
+
+            Console.WriteLine($"{player.Name} Score: {player.RoundScore}\n");
             player.ActualSerie = new();
             player.SerieScore = 0;
         }
